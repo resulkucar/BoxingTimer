@@ -1,6 +1,7 @@
 package com.example.boxingjavaapp;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,10 +13,12 @@ import android.widget.TextView;
 
 import java.util.concurrent.TimeUnit;
 
-public class MainActivity extends AppCompatActivity {
-    private static int myCounter = 0;
+public class MainActivity extends AppCompatActivity
+{
+    private static int myCounter = 1;
 
-    public int getCounter() {
+    public int getCounter()
+    {
         int a=myCounter++;
         return a;
     }
@@ -29,7 +32,8 @@ public class MainActivity extends AppCompatActivity {
     Button bStart;
     CountDownTimer timer;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         findViewById(R.id.tRest).setVisibility(View.GONE);
@@ -39,11 +43,35 @@ public class MainActivity extends AppCompatActivity {
         bStart = (Button) findViewById(R.id.start);
         bStopReset = (Button) findViewById(R.id.stop_reset);
     }
+    public void delay(int n) {
+        long restTime = n*1000;
+        timer = new CountDownTimer(restTime, 500)
+        {
+            @Override
+            public void onTick(long millSecondsLeftToFinish)
+            {
+                long min = TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish);
+                long sec = TimeUnit.MILLISECONDS.toSeconds(millSecondsLeftToFinish) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish));
+                tvTimer.setText(String.format("%02d:%02d ", min, sec));
+            }
 
+            @Override
+            public void onFinish()
+            {
+                start();
+                timer.cancel();
+                findViewById(R.id.tRest).setVisibility(View.GONE);
+                roundLength(181);
+            }
+        };
+        timer.start();
+    }
     public void rest(int n) {
         findViewById(R.id.tRest).setVisibility(View.VISIBLE);
+        final MediaPlayer ring= MediaPlayer.create(MainActivity.this,R.raw.boxring);
         long restTime = n*1000;
-        timer = new CountDownTimer(restTime, 500) {
+        timer = new CountDownTimer(restTime, 500)
+        {
             @Override
             public void onTick(long millSecondsLeftToFinish) {
                 long min = TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish);
@@ -52,23 +80,27 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFinish() {
+            public void onFinish()
+            {
                 start();
                 timer.cancel();
+                ring.start();
                 findViewById(R.id.tRest).setVisibility(View.GONE);
-                int x= getCounter();
-                roundCtr.setText(Integer.toString(x));
                 roundLength(181);
             }
         };
         timer.start();
     }
-    public void roundLength(int n) {
-
+    public void roundLength(int n)
+    {
+            final MediaPlayer ring= MediaPlayer.create(MainActivity.this,R.raw.boxring);
+            ring.start();
             long adjLength= n *1000;
-            timer = new CountDownTimer(adjLength, 500) {
+            timer = new CountDownTimer(adjLength, 500)
+            {
                 @Override
-                public void onTick(final long millSecondsLeftToFinish) {
+                public void onTick(final long millSecondsLeftToFinish)
+                {
                     time = millSecondsLeftToFinish;
                     long min = TimeUnit.MILLISECONDS.toMinutes(time);
                     long sec = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
@@ -76,41 +108,45 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFinish() {
+                public void onFinish()
+                {
                     start();
                     timer.cancel();
-                    getCounter();
-
-                    // Vibrate for 1000 milliseconds
+                    int x= getCounter();
+                    final MediaPlayer ring= MediaPlayer.create(MainActivity.this,R.raw.boxring);
+                    ring.start();
+                    roundCtr.setText(Integer.toString(x));
                     Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                     v.vibrate(1000);
                     if ((TimeUnit.MILLISECONDS.toSeconds(0) == 0)) {
                         v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                         // Vibrate for 1000 milliseconds
                         v.vibrate(1000);
-
                     }
-                    int x =getCounter();
+                    ring.start();
                     int i=12;
-                    if(x<=i){
-                        rest(46);
-                    }else {
+                    if(x<=i)
+                    {
+                        rest(45);
+                    }
+                    else {
                         timer.cancel();
                         myCounter = 0;
                     }
-
                 }
             };
             timer.start();
         }
 
-    public void startOnClick(View view) {
+    public void startOnClick(View view)
+    {
         findViewById(R.id.roundCounter).setVisibility(View.VISIBLE);
-        roundLength(181);
+        delay(10);
 
     }
 
-    public void stopOnClick(View view) {
+    public void stopOnClick(View view)
+    {
         timer.cancel();
         // reset
         myCounter=0;
