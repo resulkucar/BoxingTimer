@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
         return a;
     }
 
+    private long time = 0;
+
     TextView tvTimer;
     TextView textRest;
     TextView roundCtr;
@@ -40,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void rest(int n) {
         findViewById(R.id.tRest).setVisibility(View.VISIBLE);
-        int restTime = n*1000;
-        timer = new CountDownTimer(restTime, 1000) {
+        long restTime = n*1000;
+        timer = new CountDownTimer(restTime, 500) {
             @Override
             public void onTick(long millSecondsLeftToFinish) {
                 long min = TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish);
@@ -54,20 +56,22 @@ public class MainActivity extends AppCompatActivity {
                 start();
                 timer.cancel();
                 findViewById(R.id.tRest).setVisibility(View.GONE);
-                getCounter();
-                roundLength(5);
+                int x= getCounter();
+                roundCtr.setText(Integer.toString(x));
+                roundLength(181);
             }
         };
         timer.start();
     }
     public void roundLength(int n) {
 
-            int adjLength= n *1000;
-            timer = new CountDownTimer(adjLength, 1000) {
+            long adjLength= n *1000;
+            timer = new CountDownTimer(adjLength, 500) {
                 @Override
                 public void onTick(final long millSecondsLeftToFinish) {
-                    long min = TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish);
-                    long sec = TimeUnit.MILLISECONDS.toSeconds(millSecondsLeftToFinish) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish));
+                    time = millSecondsLeftToFinish;
+                    long min = TimeUnit.MILLISECONDS.toMinutes(time);
+                    long sec = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time));
                     tvTimer.setText(String.format("%02d:%02d ", min, sec));
                 }
 
@@ -87,11 +91,13 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                     int x =getCounter();
-                    int i=4;
-                    if(x>=i){
+                    int i=12;
+                    if(x<=i){
+                        rest(46);
+                    }else {
                         timer.cancel();
+                        myCounter = 0;
                     }
-                    rest(10);
 
                 }
             };
@@ -99,13 +105,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
     public void startOnClick(View view) {
-        roundLength(5);
+        findViewById(R.id.roundCounter).setVisibility(View.VISIBLE);
+        roundLength(181);
 
     }
 
     public void stopOnClick(View view) {
         timer.cancel();
         // reset
+        myCounter=0;
         tvTimer.setText("00:00");
     }
 
