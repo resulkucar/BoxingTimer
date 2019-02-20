@@ -30,10 +30,14 @@ public class Settings extends AppCompatActivity {
         nextPage= (Button) findViewById(R.id.nextPage);
 
     }
+
     public int NumberOfRounds(int n){
         String a =inNumRound.getText().toString();
         int numberRounds = Integer.parseInt(a);
         return numberRounds;
 
     }
+
+
+
 }
