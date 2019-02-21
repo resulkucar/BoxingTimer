@@ -15,12 +15,13 @@ import java.util.concurrent.TimeUnit;
     public class MainActivity extends AppCompatActivity
     {
         private static int InputMinRound = 0;
-        private static int InputSecRound = 5;
+        private static int InputSecRound = 10;
         private static int InputMinRest = 0;
-        private static int InputSecRest = 10;
-        private static int myCounter = 1;
+        private static int InputSecRest = 5;
+        private static int myCounter = 0;
+        private static int x = getCounter();
         private static int InputDelayMin = 0;
-        private static int InputDelaySec = 8;
+        private static int InputDelaySec = 3;
         private static long RestMinutes = InputMinRest * 60000;
         private static long RestSeconds = InputSecRest * 1000;
         private static long RestTimeInMills = RestMinutes+RestSeconds;
@@ -34,11 +35,13 @@ import java.util.concurrent.TimeUnit;
         private static long seconds = (InputSecRound) * 1000;
         private static final long StartTimeInMills = minutes + seconds;
         private boolean DelayRunning=true;
-        private boolean RoundRunning=false;
-        private boolean RestRunning =false;
-
-
-        public int getCounter()
+        private boolean RoundRunning=true;
+        private boolean RestRunning =true;
+        public static boolean delayFin=false;
+        public static boolean roundFin=false;
+        public static boolean restFin=false;
+        public static boolean lastStateRound=false;
+        public static int getCounter()
         {
             int a=myCounter++;
             return a;
@@ -85,8 +88,8 @@ import java.util.concurrent.TimeUnit;
                 public void onFinish()
                 {
                     DelayTimer.cancel();
+                    delayFin=true;
                     DelayRunning = false;
-                    RoundRunning=true;
                     findViewById(R.id.tRest).setVisibility(View.GONE);
                     roundLength(StartTimeInMills);
 
@@ -95,12 +98,12 @@ import java.util.concurrent.TimeUnit;
             DelayTimer.start();
         }
         public void rest(long mili) {
-            findViewById(R.id.tRest).setVisibility(View.VISIBLE);
-            final MediaPlayer ring= MediaPlayer.create(MainActivity.this,R.raw.boxring);
+
             RestTimer = new CountDownTimer(mili, 500)
             {
                 @Override
                 public void onTick(long millSecondsLeftToFinish) {
+                    findViewById(R.id.tRest).setVisibility(View.VISIBLE);
                     RestRunning=true;
                     restLeftInMills=millSecondsLeftToFinish;
                     long min = TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish);
@@ -111,7 +114,10 @@ import java.util.concurrent.TimeUnit;
                 @Override
                 public void onFinish()
                 {
+                    getCounter();
+                    final MediaPlayer ring= MediaPlayer.create(MainActivity.this,R.raw.boxring);
                     RestRunning=false;
+                    restFin=true;
                     RestTimer.cancel();
                     ring.start();
                     findViewById(R.id.tRest).setVisibility(View.GONE);
@@ -129,22 +135,25 @@ import java.util.concurrent.TimeUnit;
                 @Override
                 public void onTick(final long millSecondsLeftToFinish)
                 {
-
+                    lastStateRound= true;
+                    RoundRunning=true;
                     roundLeftInMills=millSecondsLeftToFinish;
                     long min = TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish);
                     long sec = TimeUnit.MILLISECONDS.toSeconds(millSecondsLeftToFinish) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish));
                     tvTimer.setText(String.format("%02d:%02d ", min, sec));
+                    roundCtr.setText(Integer.toString(x));
                 }
 
                 @Override
                 public void onFinish()
                 {
-                    RoundRunning=false;
                     RoundTimer.cancel();
-                    int x= getCounter();
+                    RoundRunning=false;
+                    roundFin=true;
+                    RestRunning=true;
+                    rest(RestTimeInMills);
                     final MediaPlayer ring= MediaPlayer.create(MainActivity.this,R.raw.boxring);
                     ring.start();
-                    roundCtr.setText(Integer.toString(x));
                     Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                     v.vibrate(1000);
                     if ((TimeUnit.MILLISECONDS.toSeconds(0) == 0)) {
@@ -152,16 +161,9 @@ import java.util.concurrent.TimeUnit;
                         // Vibrate for 1000 milliseconds
                         v.vibrate(1000);
                     }
-                    ring.start();
-                    int i=12;
-                    if(x<=i)
-                    {
-                        rest(RestTimeInMills);
-                    }
-                    else {
+                        ring.start();
                         RoundTimer.cancel();
-                        myCounter = 0;
-                    }
+                        rest(RestTimeInMills);
                 }
             };
             RoundTimer.start();
@@ -171,11 +173,34 @@ import java.util.concurrent.TimeUnit;
             findViewById(R.id.roundCounter).setVisibility(View.VISIBLE);
             bStart.setVisibility(View.INVISIBLE);
             bPause.setVisibility(View.VISIBLE);
-            if(DelayRunning==true) {
-                delay(DelayTimeInMills);
-            }else {
-                delay(delayLeftInMills);
+            if(restFin==true){
+                roundLength(StartTimeInMills);
             }
+            if(RoundRunning==false&&RestRunning==false&&roundFin==true)
+            {
+                rest(restLeftInMills);
+            }
+            else if(RoundRunning==false&&delayFin==true||restFin==true){
+                roundLength(roundLeftInMills);
+                RoundRunning=true;
+            }else if(RoundRunning=false&&RestRunning==true&&roundFin==true){//condition 1
+                rest(RestTimeInMills);
+            }else if(RoundRunning==true&&delayFin==true||restFin==true) {
+                roundLength(StartTimeInMills);
+                RoundRunning=true;
+            }else if(RoundRunning==false&&restFin==true) {
+                roundLength(roundLeftInMills);
+                RoundRunning=true;
+            }else if(RoundRunning==true&&restFin==true) {
+                roundLength(StartTimeInMills);
+                RoundRunning=true;
+            } else if(DelayRunning==true) {
+                delay(DelayTimeInMills);
+            }else if(DelayRunning==false){
+                delay(delayLeftInMills);
+            }else
+                return;
+
 
 
         }
@@ -191,20 +216,21 @@ import java.util.concurrent.TimeUnit;
                 DelayRunning = false;
 
             }
-            if(RoundRunning==true) {
+            else if(RoundRunning==true&&DelayRunning==false) {
                 RoundTimer.cancel();
                 long min = TimeUnit.MILLISECONDS.toMinutes(roundLeftInMills);
                 long sec = TimeUnit.MILLISECONDS.toSeconds(roundLeftInMills) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(roundLeftInMills));
                 tvTimer.setText(String.format("%02d:%02d ", min, sec));
                 RoundRunning = false;
             }
-            if(RestRunning==true) {
+            else if(RestRunning==true&&DelayRunning==false) {
                 RestTimer.cancel();
                 long min = TimeUnit.MILLISECONDS.toMinutes(restLeftInMills);
                 long sec = TimeUnit.MILLISECONDS.toSeconds(restLeftInMills) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(restLeftInMills));
                 tvTimer.setText(String.format("%02d:%02d ", min, sec));
                 RestRunning= false;
-            }
+            }else
+                return;
 
         }
 
