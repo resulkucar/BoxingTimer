@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
         private static int InputSecRound = 10;
         private static int InputMinRest = 0;
         private static int InputSecRest = 5;
-        private static int myCounter = 0;
+        private static int myCounter = 1;
         private static int x = getCounter();
         private static int InputDelayMin = 0;
         private static int InputDelaySec = 3;
@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
         public static boolean delayFin=false;
         public static boolean roundFin=false;
         public static boolean restFin=false;
-        public static boolean lastStateRound=false;
+
         public static int getCounter()
         {
             int a=myCounter++;
@@ -89,7 +89,7 @@ import java.util.concurrent.TimeUnit;
                 {
                     DelayTimer.cancel();
                     delayFin=true;
-                    DelayRunning = false;
+                    DelayRunning=false;
                     findViewById(R.id.tRest).setVisibility(View.GONE);
                     roundLength(StartTimeInMills);
 
@@ -103,8 +103,8 @@ import java.util.concurrent.TimeUnit;
             {
                 @Override
                 public void onTick(long millSecondsLeftToFinish) {
-                    findViewById(R.id.tRest).setVisibility(View.VISIBLE);
                     RestRunning=true;
+                    findViewById(R.id.tRest).setVisibility(View.VISIBLE);
                     restLeftInMills=millSecondsLeftToFinish;
                     long min = TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish);
                     long sec = TimeUnit.MILLISECONDS.toSeconds(millSecondsLeftToFinish) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish));
@@ -121,7 +121,6 @@ import java.util.concurrent.TimeUnit;
                     RestTimer.cancel();
                     ring.start();
                     findViewById(R.id.tRest).setVisibility(View.GONE);
-                    roundLength(StartTimeInMills);
                 }
             };
             RestTimer.start();
@@ -135,7 +134,6 @@ import java.util.concurrent.TimeUnit;
                 @Override
                 public void onTick(final long millSecondsLeftToFinish)
                 {
-                    lastStateRound= true;
                     RoundRunning=true;
                     roundLeftInMills=millSecondsLeftToFinish;
                     long min = TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish);
@@ -147,10 +145,10 @@ import java.util.concurrent.TimeUnit;
                 @Override
                 public void onFinish()
                 {
+
+                    roundFin=true;
                     RoundTimer.cancel();
                     RoundRunning=false;
-                    roundFin=true;
-                    RestRunning=true;
                     rest(RestTimeInMills);
                     final MediaPlayer ring= MediaPlayer.create(MainActivity.this,R.raw.boxring);
                     ring.start();
@@ -163,46 +161,30 @@ import java.util.concurrent.TimeUnit;
                     }
                         ring.start();
                         RoundTimer.cancel();
-                        rest(RestTimeInMills);
+
                 }
             };
             RoundTimer.start();
         }
-
         public void startOnClick(View view){
             findViewById(R.id.roundCounter).setVisibility(View.VISIBLE);
             bStart.setVisibility(View.INVISIBLE);
             bPause.setVisibility(View.VISIBLE);
-            if(restFin==true){
-                roundLength(StartTimeInMills);
-            }
-            if(RoundRunning==false&&RestRunning==false&&roundFin==true)
+            if(RestRunning==true&&roundFin==true)
             {
-                rest(restLeftInMills);
-            }
-            else if(RoundRunning==false&&delayFin==true||restFin==true){
-                roundLength(roundLeftInMills);
-                RoundRunning=true;
-            }else if(RoundRunning=false&&RestRunning==true&&roundFin==true){//condition 1
                 rest(RestTimeInMills);
-            }else if(RoundRunning==true&&delayFin==true||restFin==true) {
+            }else if(RestRunning==false&&roundFin==true) {
+                rest(restLeftInMills);
+            }else if(RoundRunning==true&&delayFin==true) {
                 roundLength(StartTimeInMills);
-                RoundRunning=true;
-            }else if(RoundRunning==false&&restFin==true) {
+            }else if(RoundRunning==false&&delayFin==true) {
                 roundLength(roundLeftInMills);
-                RoundRunning=true;
-            }else if(RoundRunning==true&&restFin==true) {
-                roundLength(StartTimeInMills);
-                RoundRunning=true;
-            } else if(DelayRunning==true) {
+            }else if(DelayRunning==true) {
                 delay(DelayTimeInMills);
             }else if(DelayRunning==false){
                 delay(delayLeftInMills);
             }else
                 return;
-
-
-
         }
 
         public void pauseOnClick(View view){
@@ -216,14 +198,14 @@ import java.util.concurrent.TimeUnit;
                 DelayRunning = false;
 
             }
-            else if(RoundRunning==true&&DelayRunning==false) {
+            else if(RoundRunning==true) {
                 RoundTimer.cancel();
                 long min = TimeUnit.MILLISECONDS.toMinutes(roundLeftInMills);
                 long sec = TimeUnit.MILLISECONDS.toSeconds(roundLeftInMills) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(roundLeftInMills));
                 tvTimer.setText(String.format("%02d:%02d ", min, sec));
                 RoundRunning = false;
             }
-            else if(RestRunning==true&&DelayRunning==false) {
+            else if(RestRunning==true) {
                 RestTimer.cancel();
                 long min = TimeUnit.MILLISECONDS.toMinutes(restLeftInMills);
                 long sec = TimeUnit.MILLISECONDS.toSeconds(restLeftInMills) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(restLeftInMills));
