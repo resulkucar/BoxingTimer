@@ -1,109 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="204dp"
-        android:text="3:00"
-        android:textSize="90sp" />
-
-    <Button
-        android:id="@+id/start"
-        style="@style/Widget.AppCompat.ImageButton"
-        android:layout_width="126dp"
-        android:layout_height="69dp"
-        android:layout_below="@id/textView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="62dp"
-        android:background="@mipmap/ic_launcher"
-        android:backgroundTint="@color/ic_launcher_background"
-        android:fontFamily="sans-serif"
-        android:onClick="startOnClick"
-        android:text="Start"
-        android:padding="5dp"
-        android:textSize="18sp"
-        android:typeface="normal" />
-    <Button
-        android:id="@+id/pause"
-        style="@style/Widget.AppCompat.ImageButton"
-        android:layout_width="126dp"
-        android:visibility="invisible"
-        android:layout_height="69dp"
-        android:layout_below="@id/textView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="62dp"
-        android:background="@mipmap/ic_launcher"
-        android:backgroundTint="@color/ic_launcher_background"
-        android:fontFamily="sans-serif"
-        android:onClick="pauseOnClick"
-        android:text="Pause"
-        android:padding="5dp"
-        android:textSize="18sp"
-        android:typeface="normal" />
-
-    <Button
-        android:text="Stop/Rest"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/stop_reset"
-        android:layout_below="@id/start"
-        android:layout_marginTop="54dp"
-        android:onClick="stopOnClick"
-         />
-
-    <TextView
-        android:id="@+id/textView6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="97dp"
-        android:layout_marginEnd="239dp"
-        android:text="Round "
-        android:textSize="30sp" />
-
-    <TextView
-        android:id="@+id/roundCounter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="96dp"
-        android:layout_centerHorizontal="true"
-        android:text="1"
-        android:textSize="30sp" />
-
-    <TextView
-        android:id="@+id/tRest"
-        android:layout_width="64dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="339dp"
-        android:layout_marginEnd="174dp"
-        android:text="Rest"
-        android:textAlignment="center"
-        android:textSize="24sp" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="177dp"
-        android:layout_height="37dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="110dp"
-        android:layout_marginTop="44dp" />
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="81dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="# of Rounds"
+        android:textColor="@android:color/black"
+        android:textSize="30sp" />
 
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="164dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Round Time"
+        android:textColor="@android:color/black"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="240dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Start Delay"
+        android:textColor="@android:color/black"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="330dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Rest Time"
+        android:textColor="@android:color/black"
+        android:textSize="30sp" />
+
+    <EditText
+        android:id="@+id/startDelay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="235dp"
+        android:layout_marginEnd="0dp"
+        android:ems="10"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/roundTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="162dp"
+        android:layout_marginEnd="0dp"
+        android:ems="10"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/restTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="329dp"
+        android:layout_marginEnd="0dp"
+        android:ems="10"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/numOfRound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="79dp"
+        android:layout_marginEnd="0dp"
+        android:ems="10"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/nextPage"
+        style="@style/Widget.AppCompat.ImageButton"
+        android:layout_width="126dp"
+        android:layout_height="69dp"
+        android:layout_below="@id/textView"
+        android:layout_alignEnd="@+id/textView2"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="-70dp"
+        android:layout_marginBottom="147dp"
+        android:background="@mipmap/ic_launcher"
+        android:backgroundTint="@color/ic_launcher_background"
+        android:fontFamily="sans-serif"
+        android:padding="1dp"
+        android:text="Start"
+        android:textSize="18sp"
+        android:typeface="normal"
+        />
 
 </RelativeLayout>
