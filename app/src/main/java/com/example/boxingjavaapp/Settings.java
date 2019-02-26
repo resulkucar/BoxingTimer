@@ -32,8 +32,8 @@ public class Settings extends AppCompatActivity {
     }
 
     public int NumberOfRounds(int n){
-        String a =inNumRound.getText().toString();
-        int numberRounds = Integer.parseInt(a);
+        //String a =inNumRound.getText().toString();
+        int numberRounds = 5;//Integer.parseInt(a);
         return numberRounds;
 
     }

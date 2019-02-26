@@ -9,148 +9,156 @@ import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-    public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity
+{
+    private static int InputMinRound = 0;
+    private static int InputSecRound = 10;
+    private static int InputMinRest = 0;
+    private static int InputSecRest = 5;
+    private static int myCounter = 1;
+    private static int InputDelayMin = 0;
+    private static int InputDelaySec = 3;
+    private static long RestMinutes = InputMinRest * 60000;
+    private static long RestSeconds = InputSecRest * 1000;
+    private static long RestTimeInMills = RestMinutes+RestSeconds;
+    private static long DelayMin = InputDelayMin * 60000;
+    private static long DelaySec = InputDelaySec * 1000;
+    private static  long DelayTimeInMills = DelayMin + DelaySec;
+    private long delayLeftInMills = DelayTimeInMills;
+    private long restLeftInMills = RestTimeInMills;
+    private long roundLeftInMills=StartTimeInMills;
+    private static long minutes = InputMinRound * 60000;
+    private static long seconds = (InputSecRound) * 1000;
+    private static  long StartTimeInMills = minutes + seconds;
+    private boolean DelayRunning=true;
+    private boolean RoundRunning=true;
+    private boolean RestRunning =true;
+    public static boolean delayFin=false;
+    public static boolean roundFin=false;
+    public static boolean restFin=false;
+    private static String CurrentTimer="Delay";
+    public static boolean Reset=false;
+
+
+    TextView tvTimer;
+    TextView textRest;
+    TextView roundCtr;
+    Button bStopReset;
+    Button bStart;
+    Button bPause;
+
+    CountDownTimer RoundTimer;
+    CountDownTimer DelayTimer;
+    CountDownTimer RestTimer;
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
     {
-        private static int InputMinRound = 0;
-        private static int InputSecRound = 10;
-        private static int InputMinRest = 0;
-        private static int InputSecRest = 5;
-        private static int myCounter = 1;
-        private static int x = getCounter();
-        private static int InputDelayMin = 0;
-        private static int InputDelaySec = 3;
-        private static long RestMinutes = InputMinRest * 60000;
-        private static long RestSeconds = InputSecRest * 1000;
-        private static long RestTimeInMills = RestMinutes+RestSeconds;
-        private static long DelayMin = InputDelayMin * 60000;
-        private static long DelaySec = InputDelaySec * 1000;
-        private static final long DelayTimeInMills = DelayMin + DelaySec;
-        private long delayLeftInMills = DelayTimeInMills;
-        private long restLeftInMills = RestTimeInMills;
-        private long roundLeftInMills=StartTimeInMills;
-        private static long minutes = InputMinRound * 60000;
-        private static long seconds = (InputSecRound) * 1000;
-        private static final long StartTimeInMills = minutes + seconds;
-        private boolean DelayRunning=true;
-        private boolean RoundRunning=true;
-        private boolean RestRunning =true;
-        public static boolean delayFin=false;
-        public static boolean roundFin=false;
-        public static boolean restFin=false;
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        findViewById(R.id.tRest).setVisibility(View.GONE);
+        textRest = (TextView) findViewById(R.id.tRest);
+        roundCtr = (TextView) findViewById(R.id.roundCounter);
+        tvTimer = (TextView) findViewById(R.id.textView);
+        bStart = (Button) findViewById(R.id.start);
+        bPause = (Button) findViewById(R.id.pause);
+        bStopReset = (Button) findViewById(R.id.stop_reset);
+    }
+    public void delay(long mili) {
 
-        public static int getCounter()
+        DelayTimer = new CountDownTimer(mili, 500)
         {
-            int a=myCounter++;
-            return a;
-        }
+            @Override
+            public void onTick(long millSecondsLeftToFinish)
+            {
+                DelayRunning=true;
+                delayLeftInMills=millSecondsLeftToFinish;
+                long min = TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish);
+                long sec = TimeUnit.MILLISECONDS.toSeconds(millSecondsLeftToFinish) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish));
+                tvTimer.setText(String.format("%02d:%02d ", min, sec));
+            }
 
-        TextView tvTimer;
-        TextView textRest;
-        TextView roundCtr;
-        Button bStopReset;
-        Button bStart;
-        Button bPause;
+            @Override
+            public void onFinish()
+            {
+                DelayTimer.cancel();
+                delayFin=true;
+                DelayRunning=false;
+                findViewById(R.id.tRest).setVisibility(View.GONE);
+                roundLength(StartTimeInMills);
 
-        CountDownTimer RoundTimer;
-        CountDownTimer DelayTimer;
-        CountDownTimer RestTimer;
-        @Override
-        protected void onCreate(Bundle savedInstanceState)
+            }
+        };
+        DelayTimer.start();
+    }
+    public void rest(long mili) {
+        CurrentTimer="Rest";
+
+        RestTimer = new CountDownTimer(mili, 500)
         {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_main);
-            findViewById(R.id.tRest).setVisibility(View.GONE);
-            textRest = (TextView) findViewById(R.id.tRest);
-            roundCtr = (TextView) findViewById(R.id.roundCounter);
-            tvTimer = (TextView) findViewById(R.id.textView);
-            bStart = (Button) findViewById(R.id.start);
-            bPause = (Button) findViewById(R.id.pause);
-            bStopReset = (Button) findViewById(R.id.stop_reset);
-        }
-        public void delay(long mili) {
+            @Override
+            public void onTick(long millSecondsLeftToFinish) {
+                RestRunning=true;
+                findViewById(R.id.tRest).setVisibility(View.VISIBLE);
+                restLeftInMills=millSecondsLeftToFinish;
+                long min = TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish);
+                long sec = TimeUnit.MILLISECONDS.toSeconds(millSecondsLeftToFinish) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish));
+                tvTimer.setText(String.format("%02d:%02d ", min, sec));
+            }
 
-            DelayTimer = new CountDownTimer(mili, 500)
+            @Override
+            public void onFinish()
             {
-                @Override
-                public void onTick(long millSecondsLeftToFinish)
-                {
-                    DelayRunning=true;
-                    delayLeftInMills=millSecondsLeftToFinish;
-                    long min = TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish);
-                    long sec = TimeUnit.MILLISECONDS.toSeconds(millSecondsLeftToFinish) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish));
-                    tvTimer.setText(String.format("%02d:%02d ", min, sec));
-                }
-
-                @Override
-                public void onFinish()
-                {
-                    DelayTimer.cancel();
-                    delayFin=true;
-                    DelayRunning=false;
-                    findViewById(R.id.tRest).setVisibility(View.GONE);
-                    roundLength(StartTimeInMills);
-
-                }
-            };
-            DelayTimer.start();
-        }
-        public void rest(long mili) {
-
-            RestTimer = new CountDownTimer(mili, 500)
-            {
-                @Override
-                public void onTick(long millSecondsLeftToFinish) {
-                    RestRunning=true;
-                    findViewById(R.id.tRest).setVisibility(View.VISIBLE);
-                    restLeftInMills=millSecondsLeftToFinish;
-                    long min = TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish);
-                    long sec = TimeUnit.MILLISECONDS.toSeconds(millSecondsLeftToFinish) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish));
-                    tvTimer.setText(String.format("%02d:%02d ", min, sec));
-                }
-
-                @Override
-                public void onFinish()
-                {
-                    getCounter();
-                    final MediaPlayer ring= MediaPlayer.create(MainActivity.this,R.raw.boxring);
-                    RestRunning=false;
-                    restFin=true;
-                    RestTimer.cancel();
-                    ring.start();
-                    findViewById(R.id.tRest).setVisibility(View.GONE);
-                }
-            };
-            RestTimer.start();
-        }
-        public void roundLength(long mili)
+                final MediaPlayer ring= MediaPlayer.create(MainActivity.this,R.raw.boxring);
+                RestRunning=false;
+                restFin=true;
+                RestTimer.cancel();
+                findViewById(R.id.tRest).setVisibility(View.GONE);
+                roundLength(StartTimeInMills);
+            }
+        };
+        RestTimer.start();
+    }
+    public void roundLength(long mili)
+    {
+        CurrentTimer="Round";
+        final MediaPlayer ring= MediaPlayer.create(MainActivity.this,R.raw.boxring);
+        ring.start();
+        RoundTimer = new CountDownTimer(mili, 500)
         {
-            final MediaPlayer ring= MediaPlayer.create(MainActivity.this,R.raw.boxring);
-            ring.start();
-            RoundTimer = new CountDownTimer(mili, 500)
+            @Override
+            public void onTick(final long millSecondsLeftToFinish)
             {
-                @Override
-                public void onTick(final long millSecondsLeftToFinish)
-                {
-                    RoundRunning=true;
-                    roundLeftInMills=millSecondsLeftToFinish;
-                    long min = TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish);
-                    long sec = TimeUnit.MILLISECONDS.toSeconds(millSecondsLeftToFinish) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish));
-                    tvTimer.setText(String.format("%02d:%02d ", min, sec));
-                    roundCtr.setText(Integer.toString(x));
-                }
+                RoundRunning=true;
+                roundLeftInMills=millSecondsLeftToFinish;
+                long min = TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish);
+                long sec = TimeUnit.MILLISECONDS.toSeconds(millSecondsLeftToFinish) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millSecondsLeftToFinish));
+                tvTimer.setText(String.format("%02d:%02d ", min, sec));
 
-                @Override
-                public void onFinish()
-                {
+            }
 
-                    roundFin=true;
+            @Override
+            public void onFinish()
+            {
+                int i=2;
+                if(myCounter==i){
                     RoundTimer.cancel();
-                    RoundRunning=false;
+                    DelayTimer.cancel();
+                    RestTimer.cancel();
+                    bPause.setVisibility(View.INVISIBLE);
+                    bStart.setVisibility(View.VISIBLE);
+                    tvTimer.setText("Done");
+                    CurrentTimer="Delay";
+                    Reset=true;
+                }else {
+                    roundFin = true;
+                    RoundTimer.cancel();
+                    RoundRunning = false;
                     rest(RestTimeInMills);
-                    final MediaPlayer ring= MediaPlayer.create(MainActivity.this,R.raw.boxring);
+                    myCounter++;
+                    roundCtr.setText(Integer.toString(myCounter));
+                    final MediaPlayer ring = MediaPlayer.create(MainActivity.this, R.raw.boxring);
                     ring.start();
                     Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                     v.vibrate(1000);
@@ -159,72 +167,81 @@ import java.util.concurrent.TimeUnit;
                         // Vibrate for 1000 milliseconds
                         v.vibrate(1000);
                     }
-                        ring.start();
-                        RoundTimer.cancel();
-
+                    ring.start();
                 }
-            };
-            RoundTimer.start();
-        }
-        public void startOnClick(View view){
-            findViewById(R.id.roundCounter).setVisibility(View.VISIBLE);
-            bStart.setVisibility(View.INVISIBLE);
-            bPause.setVisibility(View.VISIBLE);
-            if(RestRunning==true&&roundFin==true)
-            {
-                rest(RestTimeInMills);
-            }else if(RestRunning==false&&roundFin==true) {
-                rest(restLeftInMills);
-            }else if(RoundRunning==true&&delayFin==true) {
-                roundLength(StartTimeInMills);
-            }else if(RoundRunning==false&&delayFin==true) {
-                roundLength(roundLeftInMills);
-            }else if(DelayRunning==true) {
-                delay(DelayTimeInMills);
-            }else if(DelayRunning==false){
-                delay(delayLeftInMills);
-            }else
-                return;
-        }
-
-        public void pauseOnClick(View view){
-            bPause.setVisibility(View.INVISIBLE);
-            bStart.setVisibility(View.VISIBLE);
-            if(DelayRunning==true) {
-                DelayTimer.cancel();
-                long min = TimeUnit.MILLISECONDS.toMinutes(delayLeftInMills);
-                long sec = TimeUnit.MILLISECONDS.toSeconds(delayLeftInMills) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(delayLeftInMills));
-                tvTimer.setText(String.format("%02d:%02d ", min, sec));
-                DelayRunning = false;
 
             }
-            else if(RoundRunning==true) {
-                RoundTimer.cancel();
-                long min = TimeUnit.MILLISECONDS.toMinutes(roundLeftInMills);
-                long sec = TimeUnit.MILLISECONDS.toSeconds(roundLeftInMills) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(roundLeftInMills));
-                tvTimer.setText(String.format("%02d:%02d ", min, sec));
-                RoundRunning = false;
-            }
-            else if(RestRunning==true) {
-                RestTimer.cancel();
-                long min = TimeUnit.MILLISECONDS.toMinutes(restLeftInMills);
-                long sec = TimeUnit.MILLISECONDS.toSeconds(restLeftInMills) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(restLeftInMills));
-                tvTimer.setText(String.format("%02d:%02d ", min, sec));
-                RestRunning= false;
-            }else
-                return;
-
-        }
-
-        public void stopOnClick(View view)
+        };
+        RoundTimer.start();
+    }
+    public void startOnClick(View view){
+        findViewById(R.id.roundCounter).setVisibility(View.VISIBLE);
+        bStart.setVisibility(View.INVISIBLE);
+        bPause.setVisibility(View.VISIBLE);
+        if(myCounter==4)
         {
-            tvTimer.setText("00:00");
-            RoundTimer.cancel();
-            RestTimer.cancel();
-            DelayTimer.cancel();
-            // reset
-            myCounter=0;
-
+            tvTimer.setText("Done!");
+        }else if(CurrentTimer=="Rest"&&RestRunning==false) {
+            rest(restLeftInMills);
+        } else if(CurrentTimer=="Round"&&RoundRunning==false){
+            roundLength(roundLeftInMills);
+        } else if(CurrentTimer=="Delay"&&myCounter==1&&DelayRunning==false&&Reset==false){
+            delay(delayLeftInMills);
+        } else if(CurrentTimer=="Delay"&&myCounter==1||CurrentTimer=="Delay"&&Reset==true){
+            delay(DelayTimeInMills);
+            Reset=false;
         }
+    }
+
+    public void pauseOnClick(View view){
+        bPause.setVisibility(View.INVISIBLE);
+        bStart.setVisibility(View.VISIBLE);
+        if(RestRunning==true&&CurrentTimer=="Rest") {
+            RestTimer.cancel();
+            long min = TimeUnit.MILLISECONDS.toMinutes(restLeftInMills);
+            long sec = TimeUnit.MILLISECONDS.toSeconds(restLeftInMills) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(restLeftInMills));
+            tvTimer.setText(String.format("%02d:%02d ", min, sec));
+            RestRunning= false;
+        }else if(RoundRunning==true&&CurrentTimer=="Round") {
+            RoundTimer.cancel();
+            long min = TimeUnit.MILLISECONDS.toMinutes(roundLeftInMills);
+            long sec = TimeUnit.MILLISECONDS.toSeconds(roundLeftInMills) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(roundLeftInMills));
+            tvTimer.setText(String.format("%02d:%02d ", min, sec));
+            RoundRunning = false;
+        }else if(DelayRunning==true&&CurrentTimer=="Delay") {
+            DelayTimer.cancel();
+            long min = TimeUnit.MILLISECONDS.toMinutes(delayLeftInMills);
+            long sec = TimeUnit.MILLISECONDS.toSeconds(delayLeftInMills) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(delayLeftInMills));
+            tvTimer.setText(String.format("%02d:%02d ", min, sec));
+            DelayRunning = false;
+        }else
+            return;
 
     }
+
+    public void stopOnClick(View view) {
+        if (CurrentTimer == "Delay") {
+            DelayTimer.cancel();
+            Reset = true;
+            DelayRunning = false;
+        } else if (CurrentTimer == "Round") {
+            RoundTimer.cancel();
+            Reset = true;
+            RoundRunning = false;
+        } else if (CurrentTimer == "Rest") {
+            RestTimer.cancel();
+            Reset = true;
+            RestRunning = false;
+        } else{
+            return;
+    }
+        bPause.setVisibility(View.INVISIBLE);
+        bStart.setVisibility(View.VISIBLE);
+        tvTimer.setText("00:00");
+        myCounter=1;
+        roundCtr.setText(Integer.toString(myCounter));
+        CurrentTimer="Delay";
+
+    }
+
+}
